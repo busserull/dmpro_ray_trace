@@ -1,4 +1,8 @@
+mod color;
 mod vec3;
+
+use color::Color;
+use vec3::Vec3;
 
 fn main() {
     let image_height = 256;
@@ -10,15 +14,13 @@ fn main() {
 
     for row in 0..image_height {
         for col in 0..image_width {
-            let r = (col as f32) / (image_width - 1) as f32;
-            let g = (row as f32) / (image_height - 1) as f32;
-            let b = 0.0;
+            let pixel_color = Vec3(
+                col as f32 / (image_width - 1) as f32,
+                row as f32 / (image_height - 1) as f32,
+                0.0,
+            );
 
-            let ir = (255.999 * r) as i32;
-            let ig = (255.999 * g) as i32;
-            let ib = (255.999 * b) as i32;
-
-            println!("{} {} {}", ir, ig, ib);
+            println!("{}", pixel_color);
         }
     }
 }

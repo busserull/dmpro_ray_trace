@@ -1,7 +1,7 @@
 use std::ops;
 
 #[derive(Clone, Copy)]
-pub struct Vec3(f32, f32, f32);
+pub struct Vec3(pub f32, pub f32, pub f32);
 
 impl Vec3 {
     pub fn len(&self) -> f32 {
