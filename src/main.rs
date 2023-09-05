@@ -1,10 +1,12 @@
 mod color;
 mod geometry;
+mod interval;
 mod ray;
 mod vec3;
 
 use color::Color;
 use geometry::Sphere;
+use interval::Interval;
 use ray::{Hittable, Ray};
 use vec3::Vec3;
 
@@ -12,7 +14,9 @@ fn ray_color<T>(ray: &Ray, world: &T) -> Color
 where
     T: Hittable,
 {
-    if let Some(record) = world.hit(ray, 0.0, f32::INFINITY) {
+    let interval = Interval::new(0.0, f32::INFINITY);
+
+    if let Some(record) = world.hit(ray, interval) {
         return 0.5 * (record.normal + Vec3(1.0, 1.0, 1.0));
     }
 
