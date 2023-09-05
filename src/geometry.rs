@@ -36,10 +36,16 @@ impl Hittable for Sphere {
             }
         }
 
+        let t = root;
+        let p = ray.at(root);
+        let normal = (p - self.center) / self.radius;
+        let front_face = ray.direction.dot(normal) < 0.0;
+
         Some(HitRecord {
-            t: root,
-            p: ray.at(root),
-            normal: (ray.at(root) - self.center) / self.radius,
+            t,
+            p,
+            normal,
+            front_face,
         })
     }
 }
