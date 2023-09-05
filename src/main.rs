@@ -6,7 +6,7 @@ use color::Color;
 use ray::Ray;
 use vec3::Vec3;
 
-fn hit_sphere(center: Vec3, radius: f32, ray: &Ray) -> bool {
+fn hit_sphere(center: Vec3, radius: f32, ray: &Ray) -> Option<f32> {
     let center_to_ray_origin = ray.origin - center;
 
     let a = ray.direction.dot(&ray.direction);
@@ -15,12 +15,19 @@ fn hit_sphere(center: Vec3, radius: f32, ray: &Ray) -> bool {
 
     let discriminant = b * b - 4.0 * a * c;
 
-    discriminant >= 0.0
+    if discriminant >= 0.0 {
+        Some((-b - discriminant.sqrt()) / (2.0 * a))
+    } else {
+        None
+    }
 }
 
 fn ray_color(ray: &Ray) -> Color {
-    if hit_sphere(Vec3(0.0, 0.0, -1.0), 0.5, &ray) {
-        return Vec3(1.0, 0.0, 0.0);
+    let sphere_center = Vec3(0.0, 0.0, -1.0);
+
+    if let Some(t) = hit_sphere(sphere_center, 0.5, &ray) {
+        let normal = (ray.at(t) - sphere_center).unit_vector();
+        return 0.5 * Vec3(normal.x() + 1.0, normal.y() + 1.0, normal.z() + 1.0);
     }
 
     let unit_direction = ray.direction.unit_vector();
