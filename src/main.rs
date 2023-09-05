@@ -6,7 +6,23 @@ use color::Color;
 use ray::Ray;
 use vec3::Vec3;
 
+fn hit_sphere(center: Vec3, radius: f32, ray: &Ray) -> bool {
+    let center_to_ray_origin = ray.origin - center;
+
+    let a = ray.direction.dot(&ray.direction);
+    let b = 2.0 * ray.direction.dot(&center_to_ray_origin);
+    let c = center_to_ray_origin.dot(&center_to_ray_origin) - radius * radius;
+
+    let discriminant = b * b - 4.0 * a * c;
+
+    discriminant >= 0.0
+}
+
 fn ray_color(ray: &Ray) -> Color {
+    if hit_sphere(Vec3(0.0, 0.0, -1.0), 0.5, &ray) {
+        return Vec3(1.0, 0.0, 0.0);
+    }
+
     let unit_direction = ray.direction.unit_vector();
     let a = 0.5 * (unit_direction.y() + 1.0);
     (1.0 - a) * Vec3(1.0, 1.0, 1.0) + a * Vec3(0.5, 0.7, 1.0)
