@@ -2,6 +2,7 @@ mod camera;
 mod color;
 mod geometry;
 mod interval;
+mod random;
 mod ray;
 mod vec3;
 
