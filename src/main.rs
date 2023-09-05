@@ -8,12 +8,12 @@ use geometry::Sphere;
 use ray::{Hittable, Ray};
 use vec3::Vec3;
 
-fn ray_color(ray: &Ray) -> Color {
-    let sphere = Sphere::new(Vec3(0.0, 0.0, -1.0), 0.5);
-
-    if let Some(hit) = sphere.hit(&ray, 0.0, 5.0) {
-        let n = hit.normal;
-        return 0.5 * Vec3(n.x() + 1.0, n.y() + 1.0, n.z() + 1.0);
+fn ray_color<T>(ray: &Ray, world: &T) -> Color
+where
+    T: Hittable,
+{
+    if let Some(record) = world.hit(ray, 0.0, f32::INFINITY) {
+        return 0.5 * (record.normal + Vec3(1.0, 1.0, 1.0));
     }
 
     let unit_direction = ray.direction.unit_vector();
@@ -22,10 +22,19 @@ fn ray_color(ray: &Ray) -> Color {
 }
 
 fn main() {
+    // Image
+
     let aspect_ratio = 16.0 / 9.0;
 
     let image_width = 400;
     let image_height = std::cmp::max(1, (image_width as f32 / aspect_ratio) as i32);
+
+    // World
+
+    let world = vec![
+        Sphere::new(Vec3(0.0, 0.0, -1.0), 0.5),
+        Sphere::new(Vec3(0.0, -100.5, -1.0), 100.0),
+    ];
 
     // Camera
 
@@ -44,6 +53,8 @@ fn main() {
         camera_center - Vec3(0.0, 0.0, focal_length) - viewport_u / 2.0 - viewport_v / 2.0;
     let pixel00_loc = viewport_upper_left + 0.5 * (pixel_delta_u + pixel_delta_v);
 
+    // Render
+
     println!("P3");
     println!("{} {}", image_width, image_height);
     println!("255");
@@ -56,7 +67,7 @@ fn main() {
 
             let ray = Ray::new(camera_center, ray_direction);
 
-            let pixel_color = ray_color(&ray);
+            let pixel_color = ray_color(&ray, &world);
             println!("{}", pixel_color);
         }
     }
