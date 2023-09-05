@@ -4,6 +4,10 @@ use std::ops;
 pub struct Vec3(pub f32, pub f32, pub f32);
 
 impl Vec3 {
+    pub fn origin() -> Self {
+        Vec3(0.0, 0.0, 0.0)
+    }
+
     pub fn len(&self) -> f32 {
         self.len_squared().sqrt()
     }
@@ -26,6 +30,18 @@ impl Vec3 {
 
     pub fn unit_vector(&self) -> Self {
         *self / self.len()
+    }
+
+    pub fn x(&self) -> f32 {
+        self.0
+    }
+
+    pub fn y(&self) -> f32 {
+        self.1
+    }
+
+    pub fn z(&self) -> f32 {
+        self.2
     }
 }
 
@@ -68,6 +84,14 @@ impl ops::Mul<f32> for Vec3 {
 
     fn mul(self, rhs: f32) -> Self::Output {
         Vec3(self.0 * rhs, self.1 * rhs, self.2 * rhs)
+    }
+}
+
+impl ops::Mul<Vec3> for f32 {
+    type Output = Vec3;
+
+    fn mul(self, rhs: Vec3) -> Self::Output {
+        rhs * self
     }
 }
 
