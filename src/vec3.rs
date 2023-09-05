@@ -16,7 +16,7 @@ impl Vec3 {
         self.0 * self.0 + self.1 * self.1 + self.2 * self.2
     }
 
-    pub fn dot(&self, rhs: &Self) -> f32 {
+    pub fn dot(&self, rhs: Self) -> f32 {
         self.0 * rhs.0 + self.1 * rhs.1 + self.2 * rhs.2
     }
 

@@ -9,14 +9,14 @@ use vec3::Vec3;
 fn hit_sphere(center: Vec3, radius: f32, ray: &Ray) -> Option<f32> {
     let center_to_ray_origin = ray.origin - center;
 
-    let a = ray.direction.dot(&ray.direction);
-    let b = 2.0 * ray.direction.dot(&center_to_ray_origin);
-    let c = center_to_ray_origin.dot(&center_to_ray_origin) - radius * radius;
+    let a = ray.direction.len_squared();
+    let b_half = center_to_ray_origin.dot(ray.direction);
+    let c = center_to_ray_origin.len_squared() - radius * radius;
 
-    let discriminant = b * b - 4.0 * a * c;
+    let discriminant = b_half * b_half - a * c;
 
     if discriminant >= 0.0 {
-        Some((-b - discriminant.sqrt()) / (2.0 * a))
+        Some((-b_half - discriminant.sqrt()) / a)
     } else {
         None
     }
