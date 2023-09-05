@@ -1,33 +1,19 @@
 mod color;
+mod geometry;
 mod ray;
 mod vec3;
 
 use color::Color;
-use ray::Ray;
+use geometry::Sphere;
+use ray::{Hittable, Ray};
 use vec3::Vec3;
 
-fn hit_sphere(center: Vec3, radius: f32, ray: &Ray) -> Option<f32> {
-    let center_to_ray_origin = ray.origin - center;
-
-    let a = ray.direction.len_squared();
-    let b_half = center_to_ray_origin.dot(ray.direction);
-    let c = center_to_ray_origin.len_squared() - radius * radius;
-
-    let discriminant = b_half * b_half - a * c;
-
-    if discriminant >= 0.0 {
-        Some((-b_half - discriminant.sqrt()) / a)
-    } else {
-        None
-    }
-}
-
 fn ray_color(ray: &Ray) -> Color {
-    let sphere_center = Vec3(0.0, 0.0, -1.0);
+    let sphere = Sphere::new(Vec3(0.0, 0.0, -1.0), 0.5);
 
-    if let Some(t) = hit_sphere(sphere_center, 0.5, &ray) {
-        let normal = (ray.at(t) - sphere_center).unit_vector();
-        return 0.5 * Vec3(normal.x() + 1.0, normal.y() + 1.0, normal.z() + 1.0);
+    if let Some(hit) = sphere.hit(&ray, 0.0, 5.0) {
+        let n = hit.normal;
+        return 0.5 * Vec3(n.x() + 1.0, n.y() + 1.0, n.z() + 1.0);
     }
 
     let unit_direction = ray.direction.unit_vector();
