@@ -1,3 +1,4 @@
+use crate::interval::Interval;
 use crate::vec3::Vec3;
 use std::fmt;
 
@@ -5,10 +6,18 @@ pub type Color = Vec3;
 
 impl fmt::Display for Color {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let r = (255.999 * self.0) as i32;
-        let g = (255.999 * self.1) as i32;
-        let b = (255.999 * self.2) as i32;
+        let r = self.x();
+        let g = self.y();
+        let b = self.z();
 
-        write!(f, "{} {} {}", r, g, b)
+        let intensity = Interval::new(0.0, 0.999);
+
+        write!(
+            f,
+            "{} {} {}",
+            (256.0 * intensity.clamp(r)) as u32,
+            (256.0 * intensity.clamp(g)) as u32,
+            (256.0 * intensity.clamp(b)) as u32
+        )
     }
 }

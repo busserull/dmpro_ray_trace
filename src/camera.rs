@@ -1,6 +1,8 @@
+use crate::random::Random;
 use crate::ray::{Hittable, Ray};
 use crate::ray_color;
 use crate::vec3::Vec3;
+use std::cell::RefCell;
 
 pub struct Camera {
     image_height: u32,
@@ -9,6 +11,8 @@ pub struct Camera {
     pixel00_loc: Vec3,
     pixel_delta_u: Vec3,
     pixel_delta_v: Vec3,
+    samples_per_pixel: u32,
+    random: RefCell<Random>,
 }
 
 impl Camera {
@@ -22,24 +26,50 @@ impl Camera {
 
         for j in 0..self.image_height {
             for i in 0..self.image_width {
-                let pixel_center = self.pixel00_loc
-                    + (i as f32 * self.pixel_delta_u)
-                    + (j as f32 * self.pixel_delta_v);
+                let mut pixel_color = Vec3(0.0, 0.0, 0.0);
 
-                let ray_direction = pixel_center - self.center;
+                for _ in 0..self.samples_per_pixel {
+                    let ray = self.get_ray(i, j);
+                    pixel_color += ray_color(&ray, world);
+                }
 
-                let ray = Ray::new(self.center, ray_direction);
+                pixel_color /= self.samples_per_pixel as f32;
 
-                let pixel_color = ray_color(&ray, world);
                 println!("{}", pixel_color);
             }
         }
+    }
+
+    fn get_ray(&self, i: u32, j: u32) -> Ray {
+        let horz_step = i as f32 * self.pixel_delta_u;
+        let vert_step = j as f32 * self.pixel_delta_v;
+
+        let pixel_center = self.pixel00_loc + horz_step + vert_step;
+        let mut pixel_sample = pixel_center;
+
+        if self.samples_per_pixel != 1 {
+            pixel_sample += self.pixel_sample_square();
+        }
+
+        let ray_origin = self.center;
+        let ray_direction = pixel_sample - ray_origin;
+
+        Ray::new(ray_origin, ray_direction)
+    }
+
+    fn pixel_sample_square(&self) -> Vec3 {
+        let px = -0.5 + self.random.borrow_mut().get_f32();
+        let py = -0.5 + self.random.borrow_mut().get_f32();
+
+        (px * self.pixel_delta_u) + (py * self.pixel_delta_v)
     }
 }
 
 pub struct CameraBuilder {
     width: u32,
     aspect_ratio: f32,
+    samples_per_pixel: u32,
+    random_seed: u64,
 }
 
 impl CameraBuilder {
@@ -47,6 +77,8 @@ impl CameraBuilder {
         CameraBuilder {
             width: 100,
             aspect_ratio: 1.0,
+            samples_per_pixel: 1,
+            random_seed: 0,
         }
     }
 
@@ -57,6 +89,20 @@ impl CameraBuilder {
     pub fn with_aspect_ratio(self, aspect_ratio: f32) -> Self {
         Self {
             aspect_ratio,
+            ..self
+        }
+    }
+
+    pub fn with_samples_per_pixel(self, samples: u32) -> Self {
+        Self {
+            samples_per_pixel: samples,
+            ..self
+        }
+    }
+
+    pub fn with_random_seed(self, seed: u64) -> Self {
+        Self {
+            random_seed: seed,
             ..self
         }
     }
@@ -85,6 +131,8 @@ impl CameraBuilder {
             center - Vec3(0.0, 0.0, focal_length) - viewport_u / 2.0 - viewport_v / 2.0;
         let pixel00_loc = viewport_upper_left + 0.5 * (pixel_delta_u + pixel_delta_v);
 
+        let random = RefCell::new(Random::new(self.random_seed));
+
         Camera {
             image_height,
             image_width,
@@ -92,6 +140,8 @@ impl CameraBuilder {
             pixel00_loc,
             pixel_delta_u,
             pixel_delta_v,
+            samples_per_pixel: self.samples_per_pixel,
+            random,
         }
     }
 }

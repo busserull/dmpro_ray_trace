@@ -37,6 +37,7 @@ fn main() {
     let camera = CameraBuilder::new()
         .with_width(400)
         .with_aspect_ratio(16.0 / 9.0)
+        .with_samples_per_pixel(20)
         .build();
 
     camera.render(&world);
