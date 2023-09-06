@@ -26,7 +26,7 @@ where
     let interval = Interval::new(0.001, f32::INFINITY);
 
     if let Some(record) = world.hit(ray, interval) {
-        let direction = random.borrow_mut().get_vec3_in_hemisphere(record.normal);
+        let direction = record.normal + random.borrow_mut().get_vec3_unit_vector();
         let ray = Ray::new(record.p, direction);
         return 0.5 * ray_color(ray, world, depth - 1, random);
     }
