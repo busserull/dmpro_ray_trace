@@ -12,21 +12,23 @@ use geometry::Sphere;
 use interval::Interval;
 use random::Random;
 use ray::{Hittable, Ray};
+use std::cell::RefCell;
 use vec3::Vec3;
 
-use once_cell::sync::Lazy;
-
-pub fn ray_color<T>(ray: &Ray, world: &T) -> Color
+pub fn ray_color<T>(ray: Ray, world: &T, depth: u32, random: &RefCell<Random>) -> Color
 where
     T: Hittable,
 {
-    static mut RAND: Lazy<Random> = Lazy::new(|| Random::new(1));
+    if depth == 0 {
+        return Vec3(0.0, 0.0, 0.0);
+    }
 
     let interval = Interval::new(0.0, f32::INFINITY);
 
     if let Some(record) = world.hit(ray, interval) {
-        let direction = unsafe { RAND.get_vec3_in_hemisphere(record.normal) };
-        return 0.5 * ray_color(&Ray::new(record.p, direction), world);
+        let direction = random.borrow_mut().get_vec3_in_hemisphere(record.normal);
+        let ray = Ray::new(record.p, direction);
+        return 0.5 * ray_color(ray, world, depth - 1, random);
     }
 
     let unit_direction = ray.direction.unit_vector();
@@ -44,6 +46,7 @@ fn main() {
         .with_width(400)
         .with_aspect_ratio(16.0 / 9.0)
         .with_samples_per_pixel(20)
+        .with_max_depth(50)
         .build();
 
     camera.render(&world);

@@ -13,6 +13,7 @@ pub struct Camera {
     pixel_delta_v: Vec3,
     samples_per_pixel: u32,
     random: RefCell<Random>,
+    max_depth: u32,
 }
 
 impl Camera {
@@ -30,7 +31,7 @@ impl Camera {
 
                 for _ in 0..self.samples_per_pixel {
                     let ray = self.get_ray(i, j);
-                    pixel_color += ray_color(&ray, world);
+                    pixel_color += ray_color(ray, world, self.max_depth, &self.random);
                 }
 
                 pixel_color /= self.samples_per_pixel as f32;
@@ -70,6 +71,7 @@ pub struct CameraBuilder {
     aspect_ratio: f32,
     samples_per_pixel: u32,
     random_seed: u64,
+    max_depth: u32,
 }
 
 impl CameraBuilder {
@@ -79,6 +81,7 @@ impl CameraBuilder {
             aspect_ratio: 1.0,
             samples_per_pixel: 1,
             random_seed: 0,
+            max_depth: 10,
         }
     }
 
@@ -103,6 +106,13 @@ impl CameraBuilder {
     pub fn with_random_seed(self, seed: u64) -> Self {
         Self {
             random_seed: seed,
+            ..self
+        }
+    }
+
+    pub fn with_max_depth(self, depth: u32) -> Self {
+        Self {
+            max_depth: depth,
             ..self
         }
     }
@@ -142,6 +152,7 @@ impl CameraBuilder {
             pixel_delta_v,
             samples_per_pixel: self.samples_per_pixel,
             random,
+            max_depth: self.max_depth,
         }
     }
 }

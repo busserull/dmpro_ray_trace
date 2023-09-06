@@ -2,14 +2,14 @@ use crate::interval::Interval;
 use crate::vec3::Vec3;
 
 pub trait Hittable {
-    fn hit(&self, ray: &Ray, interval: Interval) -> Option<HitRecord>;
+    fn hit(&self, ray: Ray, interval: Interval) -> Option<HitRecord>;
 }
 
 impl<T> Hittable for Vec<T>
 where
     T: Hittable,
 {
-    fn hit(&self, ray: &Ray, interval: Interval) -> Option<HitRecord> {
+    fn hit(&self, ray: Ray, interval: Interval) -> Option<HitRecord> {
         let mut closest = interval.max;
         let mut record = None;
 
@@ -33,6 +33,7 @@ pub struct HitRecord {
     pub front_face: bool,
 }
 
+#[derive(Clone, Copy)]
 pub struct Ray {
     pub origin: Vec3,
     pub direction: Vec3,
