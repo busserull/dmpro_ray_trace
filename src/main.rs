@@ -10,17 +10,23 @@ use camera::CameraBuilder;
 use color::Color;
 use geometry::Sphere;
 use interval::Interval;
+use random::Random;
 use ray::{Hittable, Ray};
 use vec3::Vec3;
+
+use once_cell::sync::Lazy;
 
 pub fn ray_color<T>(ray: &Ray, world: &T) -> Color
 where
     T: Hittable,
 {
+    static mut RAND: Lazy<Random> = Lazy::new(|| Random::new(1));
+
     let interval = Interval::new(0.0, f32::INFINITY);
 
     if let Some(record) = world.hit(ray, interval) {
-        return 0.5 * (record.normal + Vec3(1.0, 1.0, 1.0));
+        let direction = unsafe { RAND.get_vec3_in_hemisphere(record.normal) };
+        return 0.5 * ray_color(&Ray::new(record.p, direction), world);
     }
 
     let unit_direction = ray.direction.unit_vector();
