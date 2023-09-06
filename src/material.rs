@@ -6,7 +6,7 @@ use std::cell::RefCell;
 pub enum Material {
     Default,
     Lambertian { albedo: Color },
-    Metal { albedo: Color },
+    Metal { albedo: Color, fuzz: f32 },
 }
 
 impl Material {
@@ -34,13 +34,14 @@ impl Material {
                 Some((scatter, attenuation))
             }
 
-            Metal { albedo } => {
+            Metal { albedo, fuzz } => {
                 let reflection = ray.direction.reflect(record.normal).unit_vector();
-                let scatter = Ray::new(record.p, reflection);
+                let fuzziness = *fuzz * random.borrow_mut().get_vec3_unit_vector();
+                let scatter = Ray::new(record.p, reflection + fuzziness);
 
                 let attenuation = *albedo;
 
-                Some((scatter, attenuation))
+                (scatter.direction.dot(record.normal) > 0.0).then_some((scatter, attenuation))
             }
         }
     }
