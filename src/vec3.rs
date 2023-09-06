@@ -32,6 +32,10 @@ impl Vec3 {
         *self / self.len()
     }
 
+    pub fn reflect(&self, normal: Self) -> Self {
+        *self - 2.0 * self.dot(normal) * normal
+    }
+
     pub fn x(&self) -> f32 {
         self.0
     }

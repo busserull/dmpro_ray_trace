@@ -27,9 +27,10 @@ where
     let interval = Interval::new(0.001, f32::INFINITY);
 
     if let Some(record) = world.hit(ray, interval) {
-        let direction = record.normal + random.borrow_mut().get_vec3_unit_vector();
-        let ray = Ray::new(record.p, direction);
-        return 0.5 * ray_color(ray, world, depth - 1, random);
+        if let Some((scatter, attenuation)) = record.material.scatter(ray, &record, random) {
+            return attenuation * ray_color(scatter, world, depth - 1, random);
+        }
+        return Vec3(0.0, 0.0, 0.0);
     }
 
     let unit_direction = ray.direction.unit_vector();
