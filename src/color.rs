@@ -4,11 +4,15 @@ use std::fmt;
 
 pub type Color = Vec3;
 
+fn linear_to_gamma(lin: f32) -> f32 {
+    lin.sqrt()
+}
+
 impl fmt::Display for Color {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let r = self.x();
-        let g = self.y();
-        let b = self.z();
+        let r = linear_to_gamma(self.x());
+        let g = linear_to_gamma(self.y());
+        let b = linear_to_gamma(self.z());
 
         let intensity = Interval::new(0.0, 0.999);
 
