@@ -43,6 +43,11 @@ impl Vec3 {
     pub fn z(&self) -> f32 {
         self.2
     }
+
+    pub fn near_zero(&self) -> bool {
+        let s = 1.0e-8;
+        self.0.abs() < s && self.1.abs() < s && self.2.abs() < s
+    }
 }
 
 impl ops::AddAssign for Vec3 {
