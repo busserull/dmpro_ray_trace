@@ -23,7 +23,7 @@ where
         return Vec3(0.0, 0.0, 0.0);
     }
 
-    let interval = Interval::new(0.0, f32::INFINITY);
+    let interval = Interval::new(0.001, f32::INFINITY);
 
     if let Some(record) = world.hit(ray, interval) {
         let direction = random.borrow_mut().get_vec3_in_hemisphere(record.normal);
