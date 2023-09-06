@@ -1,15 +1,22 @@
 use crate::interval::Interval;
+use crate::material::Material;
 use crate::ray::{HitRecord, Hittable, Ray};
 use crate::vec3::Vec3;
+use std::rc::Rc;
 
 pub struct Sphere {
     center: Vec3,
     radius: f32,
+    material: Rc<Material>,
 }
 
 impl Sphere {
     pub fn new(center: Vec3, radius: f32) -> Self {
-        Self { center, radius }
+        Self {
+            center,
+            radius,
+            material: Rc::new(Material::Default),
+        }
     }
 }
 
@@ -47,6 +54,7 @@ impl Hittable for Sphere {
             p,
             normal,
             front_face,
+            material: Rc::clone(&self.material),
         })
     }
 }

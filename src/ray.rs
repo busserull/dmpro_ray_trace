@@ -1,5 +1,7 @@
 use crate::interval::Interval;
+use crate::material::Material;
 use crate::vec3::Vec3;
+use std::rc::Rc;
 
 pub trait Hittable {
     fn hit(&self, ray: Ray, interval: Interval) -> Option<HitRecord>;
@@ -31,6 +33,7 @@ pub struct HitRecord {
     pub p: Vec3,
     pub normal: Vec3,
     pub front_face: bool,
+    pub material: Rc<Material>,
 }
 
 #[derive(Clone, Copy)]
