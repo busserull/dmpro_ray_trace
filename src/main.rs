@@ -46,17 +46,17 @@ fn main() {
     });
 
     let material_center = Rc::new(Material::Lambertian {
-        albedo: Vec3(0.7, 0.3, 0.3),
+        albedo: Vec3(0.1, 0.2, 0.5),
     });
 
     let material_left = Rc::new(Material::Metal {
-        albedo: Vec3(0.8, 0.8, 0.8),
-        fuzz: 0.3,
+        albedo: Vec3(0.5, 0.8, 0.6),
+        fuzz: 0.2,
     });
 
     let material_right = Rc::new(Material::Metal {
         albedo: Vec3(0.8, 0.6, 0.2),
-        fuzz: 1.0,
+        fuzz: 0.0,
     });
 
     let world = vec![
@@ -69,8 +69,8 @@ fn main() {
     let camera = CameraBuilder::new()
         .with_width(400)
         .with_aspect_ratio(16.0 / 9.0)
-        .with_samples_per_pixel(50)
-        .with_max_depth(50)
+        .with_samples_per_pixel(20)
+        .with_max_depth(15)
         .build();
 
     camera.render(&world);

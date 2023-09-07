@@ -35,10 +35,10 @@ impl Hittable for Sphere {
         }
 
         let d = discriminant.sqrt();
-        let root = (-b_half - d) / a;
+        let mut root = (-b_half - d) / a;
 
         if !interval.surrounds(root) {
-            let root = (-b_half + d) / a;
+            root = (-b_half + d) / a;
             if !interval.surrounds(root) {
                 return None;
             }
@@ -48,13 +48,14 @@ impl Hittable for Sphere {
         let p = ray.at(root);
         let normal = (p - self.center) / self.radius;
         let front_face = ray.direction.dot(normal) < 0.0;
+        let material = Rc::clone(&self.material);
 
         Some(HitRecord {
             t,
             p,
             normal,
             front_face,
-            material: Rc::clone(&self.material),
+            material,
         })
     }
 }

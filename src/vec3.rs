@@ -36,6 +36,16 @@ impl Vec3 {
         *self - 2.0 * self.dot(normal) * normal
     }
 
+    pub fn refract(&self, normal: Self, refraction_ratio: f32) -> Self {
+        let v_in = *self;
+        let cos_theta = (-v_in).dot(normal).min(1.0);
+
+        let out_perpendicular = refraction_ratio * (v_in + cos_theta * normal);
+        let out_parallel = -(1.0 - out_perpendicular.len_squared()).abs().sqrt() * normal;
+
+        out_perpendicular + out_parallel
+    }
+
     pub fn x(&self) -> f32 {
         self.0
     }
